@@ -41,7 +41,7 @@ main.rb
 	print y.method(Y,:foo).body.file,"\n" # source2.rb
 
 
-NOTE: See samples
+NOTE: See examples directory of the gem installation
 
 == Copying
 
