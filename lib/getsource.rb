@@ -20,3 +20,19 @@ along with getsource.  if not, see <http://www.gnu.org/licenses/>.
 =end
 require "getsource_base"
 
+class Object
+  def specific_method(arg1, arg2=nil)
+    if arg2
+      method_name = arg2
+      klass = arg1
+
+      if instance_of? Class
+        method(method_name)
+      else
+        klass.instance_method(method_name).bind(self)
+      end
+    else
+      method(arg1)
+    end
+  end
+end
