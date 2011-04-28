@@ -19,9 +19,9 @@ along with getsource.  if not, see <http://www.gnu.org/licenses/>.
 
 */
 
+#include <ruby.h>
 #ifdef RUBY1_8
 
-#include <ruby.h>
 #include <node.h>
 
 struct METHOD {
@@ -78,13 +78,14 @@ VALUE rb_method_body(VALUE self) {
 The number of the line where the code associated with note are defined in the ruby source file
 */
 VALUE rb_node_line(VALUE self) {
+#ifdef RUBY1_8
     NODE* _node;
-    #ifdef RUBY1_8
     Data_Get_Struct(self,NODE,_node);
 
     return INT2FIX(nd_line(_node));
 
-    #endif
+#endif
+
 }
 
 /*
@@ -112,13 +113,6 @@ bm_mark(struct METHOD *data)
     rb_gc_mark(data->recv);
     rb_gc_mark((VALUE)data->body);
 #endif
-#ifdef RUBY1_9
-    rb_gc_mark(data->rclass);
-    rb_gc_mark(data->oclass);
-    rb_gc_mark(data->recv);
-    rb_gc_mark((VALUE)data->body);
-#endif
-
 }
 
 static VALUE
