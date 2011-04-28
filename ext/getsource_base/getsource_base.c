@@ -19,29 +19,11 @@ along with getsource.  if not, see <http://www.gnu.org/licenses/>.
 
 */
 
+#ifdef RUBY1_8
+
 #include <ruby.h>
-
-#ifdef RUBY1_8
 #include <node.h>
-#endif
 
-#ifdef RUBY1_9
-#include <node_defs.h>
-#endif
-
-#ifndef __USE_GNU
-#define __USE_GNU
-#endif
-#include <dlfcn.h>
-
-
-VALUE rb_cNode;
-ID intern_owner;
-ID intern_name;
-ID intern_sym;
-
-///  from eval.c
-#ifdef RUBY1_8
 struct METHOD {
     VALUE klass, rklass;
 
@@ -53,32 +35,19 @@ struct METHOD {
 unsigned char* base__;
 
 #define nd_file(n) n->nd_file
+#include <dlfcn.h>
 
 #endif
 
-#ifdef RUBY1_9
 
-// from proc.c
-struct METHOD {
-    VALUE oclass;		/* class that holds the method */
-    VALUE rclass;		/* class of the receiver */
-    VALUE recv;
-    ID id, oid;
-    NODE *body;
-};
-
-typedef struct rb_iseq_struct__ {
-    VALUE type;          // instruction sequence type
-    VALUE name;	         // String: iseq name
-    VALUE filename;      // file information where this sequence from
-} rb_iseq_t__;
-
+VALUE rb_cNode;
+ID intern_owner;
+ID intern_name;
+ID intern_sym;
 
 typedef VALUE (*MNEW)(VALUE klass, VALUE obj, ID id, VALUE mclass, int scope);
 MNEW mnew_;
 unsigned char* base__;
-
-#endif
 
 /*
 	The node that acts as body of the method
@@ -89,20 +58,20 @@ VALUE rb_method_body(VALUE self) {
 //	VALUE sym = rb_funcall(name, intern_sym, 0);
 //	VALUE owner = rb_funcall(self, intern_owner, 0);
 //	NODE* body = rb_method_node(owner, SYM2ID(sym) );
+#ifdef RUBY1_8
 
 	struct METHOD* method;
 	Data_Get_Struct(self,struct METHOD,method);
 
 	if (method->body == 0) return Qnil;
 
-#ifdef RUBY1_8
 	// nd_defn is only present in ruby_1.8
 	if (method->body->nd_defn != 0) {
 		return Data_Wrap_Struct(rb_cNode, 0, 0, method->body->nd_defn);
 	}
-#endif
 
 	return Data_Wrap_Struct(rb_cNode, 0, 0, method->body);
+#endif
 }
 
 /*
@@ -110,14 +79,11 @@ The number of the line where the code associated with note are defined in the ru
 */
 VALUE rb_node_line(VALUE self) {
     NODE* _node;
+    #ifdef RUBY1_8
     Data_Get_Struct(self,NODE,_node);
 
-    #ifdef RUBY1_8
     return INT2FIX(nd_line(_node));
-    #endif
 
-    #ifdef RUBY1_9
-    return INT2FIX(0);
     #endif
 }
 
@@ -125,30 +91,15 @@ VALUE rb_node_line(VALUE self) {
 The name of the ruby source file where the code associated with the node are defined
 */
 VALUE rb_node_file(VALUE self) {
+	#ifdef RUBY1_8
     NODE* _node;
     Data_Get_Struct(self,NODE,_node);
 
-	#ifdef RUBY1_8
     if (nd_file(_node)  == NULL ) {
 	    return rb_str_new2("");
     }
     return rb_str_new2(nd_file(_node) );
     #endif
-
-    #ifdef RUBY1_9
-
-	if (nd_type(_node) == RUBY_VM_METHOD_NODE) {
-		VALUE iseqval = (VALUE)(_node->nd_body);
-		rb_iseq_t__* ptr;
-		Data_Get_Struct(iseqval, rb_iseq_t__, ptr);
-
-		return ptr->filename;
-	}
-
-	return rb_str_new2("");
-
-	#endif
-
 }
 
 
@@ -173,6 +124,7 @@ bm_mark(struct METHOD *data)
 static VALUE
 umethod_unchecked_bind(VALUE method, VALUE recv)
 {
+#ifdef RUBY1_8
     struct METHOD *data, *bound;
 
     Data_Get_Struct(method, struct METHOD, data);
@@ -180,14 +132,11 @@ umethod_unchecked_bind(VALUE method, VALUE recv)
     method = Data_Make_Struct(rb_cMethod, struct METHOD, bm_mark, -1, bound);
     *bound = *data;
     bound->recv = recv;
-#ifdef RUBY1_8
     bound->rklass = CLASS_OF(recv);
-#endif
-#ifdef RUBY1_9
-    bound->rclass = CLASS_OF(recv);
-#endif
 
     return method;
+#endif
+
 }
 
 
