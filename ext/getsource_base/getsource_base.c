@@ -139,6 +139,10 @@ void  Init_getsource_base() {
 	intern_name = rb_intern("name");
 	intern_sym = rb_intern("to_sym");
 }
+#else
+
+void  Init_getsource_base() {
+}
 
 #endif
 
