@@ -37,9 +37,6 @@ unsigned char* base__;
 #define nd_file(n) n->nd_file
 #include <dlfcn.h>
 
-#endif
-
-
 VALUE rb_cNode;
 ID intern_owner;
 ID intern_name;
@@ -58,7 +55,6 @@ VALUE rb_method_body(VALUE self) {
 //	VALUE sym = rb_funcall(name, intern_sym, 0);
 //	VALUE owner = rb_funcall(self, intern_owner, 0);
 //	NODE* body = rb_method_node(owner, SYM2ID(sym) );
-#ifdef RUBY1_8
 
 	struct METHOD* method;
 	Data_Get_Struct(self,struct METHOD,method);
@@ -71,28 +67,24 @@ VALUE rb_method_body(VALUE self) {
 	}
 
 	return Data_Wrap_Struct(rb_cNode, 0, 0, method->body);
-#endif
 }
 
 /*
 The number of the line where the code associated with note are defined in the ruby source file
 */
 VALUE rb_node_line(VALUE self) {
-#ifdef RUBY1_8
     NODE* _node;
     Data_Get_Struct(self,NODE,_node);
 
     return INT2FIX(nd_line(_node));
 
-#endif
-
 }
+
 
 /*
 The name of the ruby source file where the code associated with the node are defined
 */
 VALUE rb_node_file(VALUE self) {
-	#ifdef RUBY1_8
     NODE* _node;
     Data_Get_Struct(self,NODE,_node);
 
@@ -100,25 +92,21 @@ VALUE rb_node_file(VALUE self) {
 	    return rb_str_new2("");
     }
     return rb_str_new2(nd_file(_node) );
-    #endif
 }
 
 
 static void
 bm_mark(struct METHOD *data)
 {
-#ifdef RUBY1_8
     rb_gc_mark(data->klass);
     rb_gc_mark(data->rklass);
     rb_gc_mark(data->recv);
     rb_gc_mark((VALUE)data->body);
-#endif
 }
 
 static VALUE
 umethod_unchecked_bind(VALUE method, VALUE recv)
 {
-#ifdef RUBY1_8
     struct METHOD *data, *bound;
 
     Data_Get_Struct(method, struct METHOD, data);
@@ -129,8 +117,6 @@ umethod_unchecked_bind(VALUE method, VALUE recv)
     bound->rklass = CLASS_OF(recv);
 
     return method;
-#endif
-
 }
 
 
@@ -145,11 +131,14 @@ void  Init_getsource_base() {
 	the ruby source code and may be associated with a file and line where thats node are defined
 	*/
 	rb_cNode = rb_define_class("Node", rb_cObject);
-
 	rb_define_method(rb_cNode, "line", rb_node_line, 0);
 	rb_define_method(rb_cNode, "file", rb_node_file, 0);
+
 
 	intern_owner = rb_intern("owner");
 	intern_name = rb_intern("name");
 	intern_sym = rb_intern("to_sym");
 }
+
+#endif
+
