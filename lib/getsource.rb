@@ -37,7 +37,11 @@ class Method
     instance_method("body")
   rescue
     def body
-      Method::Node.new(source_location[0], source_location[1])
+      if source_location
+        Method::Node.new(source_location[0], source_location[1])
+      else
+        Method::Node.new("",0)
+      end
     end
   end
 end
@@ -47,7 +51,11 @@ class UnboundMethod
     instance_method("body")
   rescue
     def body
-      Method::Node.new(source_location[0], source_location[1])
+      if source_location
+        Method::Node.new(source_location[0], source_location[1])
+      else
+        Method::Node.new("",0)
+      end
     end
   end
 end
