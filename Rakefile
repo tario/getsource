@@ -1,8 +1,8 @@
 require 'rubygems'
 require 'rake'
 require 'rake/testtask'
-require 'rake/rdoctask'
-require 'rake/gempackagetask'
+require 'rdoc/task'
+require 'rubygems/package_task'
 
 spec = Gem::Specification.new do |s|
   s.name = 'getsource'
@@ -37,7 +37,7 @@ Rake::RDocTask.new :rdoc do |rd|
 end
 
 desc 'Build Gem'
-Rake::GemPackageTask.new spec do |pkg|
+Gem::PackageTask.new spec do |pkg|
   pkg.need_tar = true
 end
 
