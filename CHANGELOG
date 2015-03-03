@@ -1,3 +1,7 @@
+0.2.2:  Fixed Rakefile for ruby 2.2.0
+
+		Fixed extconf.rb for ruby 2.2.0
+
 0.2.1:	Fixed bug when trying to obtain source information for C methods in ruby 1.9 (reported by der-flo)
 
 0.2.0:	Implemented getsource methods in pure ruby for ruby 1.9 using source_location
