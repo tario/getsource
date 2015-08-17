@@ -1,8 +1,8 @@
 require 'mkmf'
 dir_config('getsource_base')
-MakeMakefile::CONFIG['CC'] = 'gcc'
+RbConfig::CONFIG['CC'] = 'gcc'
 
-ruby_version = MakeMakefile::CONFIG["ruby_version"]
+ruby_version = RbConfig::CONFIG["ruby_version"]
 ruby_version = ruby_version.split(".")[0..1].join(".")
 
 if ruby_version == "1.8"
