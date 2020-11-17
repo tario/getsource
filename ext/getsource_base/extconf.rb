@@ -1,6 +1,6 @@
 require 'mkmf'
 dir_config('getsource_base')
-MakeMakefile::CONFIG['CC'] = 'gcc'
+MakeMakefile::CONFIG['CC'] = ENV['CC'] or 'gcc'
 
 ruby_version = MakeMakefile::CONFIG["ruby_version"]
 ruby_version = ruby_version.split(".")[0..1].join(".")
